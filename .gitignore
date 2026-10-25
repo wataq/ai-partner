@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.idea/
+.env
+
+# 密钥与个人聊天记录，绝不能上传
+.streamlit/secrets.toml
+sessions/
+
+.DS_Store
+
+# 课程练习文件，不随项目发布
+W1/
+W2/
+
+# 跟课原版，留作本地对照，不发布
+ai_partner_6.py
