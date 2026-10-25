@@ -25,6 +25,12 @@ SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
 # 只把最近 20 条消息发给模型，防止聊久了超出上下文上限
 MAX_HISTORY = 20
 
+# 单个会话最多 30 条消息（15 轮），防止无节制消耗额度
+MAX_MESSAGES = 30
+
+# 单条回复最多 300 tokens
+MAX_TOKENS = 300
+
 
 # 生成会话标识函数
 def generate_session_name():
@@ -195,8 +201,11 @@ with st.sidebar:
     st.session_state.nature = nature.strip() or st.session_state.nature
 
 
-# 消息输入框
-prompt = st.chat_input("请输入您的消息：")
+# 消息输入框（聊满上限就禁用，换新会话才能继续）
+limit_reached = len(st.session_state.messages) >= MAX_MESSAGES
+if limit_reached:
+    st.info("这个会话已经聊满 30 条了，点左侧「新建会话」继续吧。")
+prompt = st.chat_input("请输入您的消息：", disabled=limit_reached)
 if prompt:
     st.chat_message("user").write(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -208,6 +217,7 @@ if prompt:
         # 调用 ai 大模型
         response = client.chat.completions.create(
             model="deepseek-chat",
+            max_tokens=MAX_TOKENS,
             messages=[
                 {
                     "role": "system",
