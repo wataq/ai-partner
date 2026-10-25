@@ -1,5 +1,9 @@
 # AI 智能伴侣
 
+**在线体验**：<https://ai-partner-wataq.streamlit.app>
+
+![应用截图](assets/screenshot.png)
+
 基于 Streamlit + DeepSeek API 的角色扮演对话应用，支持多会话管理、自定义人设和流式输出。
 
 ## 功能
@@ -46,12 +50,24 @@ DEEPSEEK_API_KEY = "你的key"
 streamlit run ai_partner_7.py
 ```
 
+## 实现细节
+
+几处不是照教程抄的：
+
+- 路径跟着代码走（`Path(__file__).parent`），换机器不用改配置
+- 上下文只取最近 20 条，避免多轮对话把窗口撑爆
+- 单会话 30 条消息、单条回复 300 tokens 的双重上限，控制调用成本
+- 调用失败时回滚刚发出的用户消息，重试不会产生重复对话
+- 鉴权失败不回显原始异常，避免把 key 片段暴露给访问者
+- 新建会话不落空文件，历史列表保持干净
+
 ## 目录结构
 
 ```
 .
 ├── ai_partner_7.py      主程序
 ├── assets/sample.png    侧边栏 logo
+├── assets/screenshot.png 界面截图
 ├── sessions/            会话存档（不上传）
 ├── requirements.txt
 └── README.md
