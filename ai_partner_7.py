@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
-from openai import OpenAI
+from openai import OpenAI, AuthenticationError
 
 # 页面设置
 st.set_page_config(
@@ -247,4 +247,8 @@ if prompt:
     except Exception as e:
         # 调用失败就把刚才那条用户消息撤回，避免重试时重复
         st.session_state.messages.pop()
-        st.error(f"调用失败，请检查网络、余额或 API Key：{e}")
+        # 鉴权失败不回显原始异常，否则会把 key 尾号暴露给访问者
+        if isinstance(e, AuthenticationError):
+            st.error("API Key 无效或已失效，请检查 Secrets 里的 DEEPSEEK_API_KEY。")
+        else:
+            st.error(f"调用失败，请检查网络或余额：{e}")
